@@ -1,0 +1,52 @@
+ // Import the initialstateclient module and create an instance of the InitialState class
+// to invoke Initial State's APIs
+var initialstateModule = require('initialstate/initialstateclient');
+var initialState = new initialstateModule.InitialState();
+ 
+try {
+  
+  // Create a bucket (Initial State makes sure it is only created once)
+  var bucket = {bucketKey:"precision_farming", bucketName: "Precison Farming Measures"};
+  initialState.createBucket(bucket); 
+  
+  // Our script store the events it receives (flow and temperature) as long as it is not informed
+  // of the end of the transmission (request.parameters.done)
+  var done = request.parameters.done;
+  if (!done) {
+ 
+    // Retrieve the values of the water flow and temperature from the parameters 
+    // of the incoming request
+    var flow = request.parameters.flow;
+    var temp = request.parameters.temp;
+    
+    // Store the received values as events in the script's local storage
+    var dateTime = new Date();
+    var flowEvent = {key: "flow", "value": flow, iso8601: dateTime.toISOString() };
+    var tempEvent = {key: "temp", "value": temp, iso8601: dateTime.toISOString() };
+     if (!storage.local.waterflowMeasures) {
+    	storage.local.waterflowMeasures = {}; // Lazy initialization of a field in the store 
+     }
+ 
+    storage.local.waterflowMeasures["flow_" +  dateTime] = flowEvent;
+    storage.local.waterflowMeasures["temp_" +  dateTime] = tempEvent;
+    return "Stored 2 events ";
+  }else {   
+   
+    // The script is now informed that the transmission of events is done, it needs to send 
+    // all the events to an Initial State bucket
+    
+    // Retrieve the events from the store and put them into an array
+    var eventArray = [];
+    for (var eventKey in storage.local.waterflowMeasures) {
+      eventArray.push(storage.local.waterflowMeasures[eventKey]);
+    }
+ 
+    // Invoke the sendEvents method of the Initial State connector to send the events 
+    var response = initialState.sendEvents({bucketKey: "precision_farming", events: eventArray});
+    
+    storage.local.waterflowMeasures = null;
+    return "Sent all events to bucket: " + response;
+  } 
+}catch (exception) {
+  return exception;
+}
