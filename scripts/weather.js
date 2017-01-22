@@ -1,8 +1,4 @@
-/** Script ACLs do not delete 
- read=nobody 
-write=nobody
-execute=authenticated 
-  **/ 
+ 
  // import the built-in http module to issue calls to remote APIs
 var http = require("http");
 // retrieve the location parameter from the request

@@ -1,4 +1,9 @@
- var status = request.parameters.status;
+// usage
+// http://doit.scriptrapps.io/davraService/filterByStatus?status=2  returns active units
+// http://doit.scriptrapps.io/davraService/filterByStatus?status=1 returns non-active units
+
+
+var status = request.parameters.status;
 var http = require("http");
 var healthService = "http://54.243.241.106:58000/eem/api/v1/gps";
 // invoke the healthService third party API
