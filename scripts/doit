@@ -1,0 +1,30 @@
+var http = require("http");
+		var ip = request.headers["x-forwarded-for"];
+		var iplookupUrl = "https://postman-echo.com/get?country=xanadoo";
+		var response = http.request({url: iplookupUrl});
+		            
+		if(response.status == "200"){
+		    var result = JSON.parse(response.body);
+		    var country = result.args.country;
+		    if(!storage.local[country]){
+		    	storage.local[country] = {count :1}
+		    }else{
+		     	storage.local[country].count += 1;
+		    }      
+          
+          var time = request.parameters["time"];
+          
+          var message= "from " + ip + " IP " + 
+            storage.local[country].count +  " times, located in " + country +".";
+          
+          var mailBody = "Hello,<br> " + message + "<br>";
+			//  mailBody += "<a href='https://api.scriptr.io/discard?id=" + request.id + "'>Click here to discard the alert</a>";
+		  var emailConfig = {
+				  "to": "tom@plexient.com",
+				  "fromName": "scriptio",
+				  "subject": "fun is where you find it",
+				  "bodyHtml": mailBody
+					};
+			return sendMail(emailConfig.to, emailConfig.fromName, emailConfig.subject, emailConfig.bodyHtml);                                  
+            
+		 }			
