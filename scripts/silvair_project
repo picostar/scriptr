@@ -1,0 +1,55 @@
+var log = require("log");
+log.setLevel("debug");
+
+var http = require("http");
+
+var creds = {
+  "email": "tom.gilley@convergia.io",
+  "password": "wot1100io",
+  "partnerId": "silvair"
+};
+
+var requestAuth = {
+    "url": "https://api.platform-prod.silvair.com/public/auth/login",
+    "method": "post",
+    "headers": {
+        "Accept": "application/json",
+        "Content-Type": "application/json"
+    },
+    "bodyString": JSON.stringify(creds)
+}; 
+
+var resp = http.request(requestAuth);
+if (resp.status == "200") {
+    // lets parse the body of the response
+    var response = JSON.parse(resp.body);
+    var token = (response.token)
+//return token;
+}
+
+var OccRequest = {
+    "url": "https://api.platform-prod.silvair.com/projects/5dfd3a9cf3816c00073599e9/areas" ,
+    "method": "GET",  
+	"headers": {
+        "Accept": "application/json",
+        "Content-Type": "application/json",
+        "Authorization": token ,
+	} ,
+    "params":  {
+        "include": "nodesCount",
+        "include":"gateways"
+	}
+};
+
+
+var occret = http.request(OccRequest);
+if (occret.status == "200") {	
+    var occdata = JSON.parse(occret.body);
+return occdata;
+}
+
+
+
+
+
+
